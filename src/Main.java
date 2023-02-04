@@ -1,14 +1,8 @@
-
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        Solution n = new Solution();
-        int[][] routes1 = new int[][]{{1,2,7},{3,6,7}};
-        System.out.println(n.numBusesToDestination(routes1,1,6));
-        int[][] routes2 = new int[][] {{7,12},{4,5,15},{6},{15,19},{9,12,13}};
-        System.out.println(n.numBusesToDestination(routes2,15,12));
 
     }
 
