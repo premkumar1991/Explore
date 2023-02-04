@@ -1,3 +1,5 @@
+package designpatterns;
+
 public class LazyInitializedSingleton {
 
     private static LazyInitializedSingleton instance;
