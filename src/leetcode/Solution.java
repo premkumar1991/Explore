@@ -1,49 +1,33 @@
 package leetcode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-class Solution {
-    int minBus=0;
-    Map<String,Boolean> vis=new HashMap<>();
-    Map<Integer, List<Integer>> stopToBus=new HashMap<>();
-    public int numBusesToDestination(int[][] routes, int source, int target) {
-        minBus=routes.length+1;
-        if(source==target)
-            return 1;
-        for(int i=0;i<routes.length;++i){
-            for(int j=0;j<routes[i].length;++j){
-                if(!stopToBus.containsKey(routes[i][j])){
-                    stopToBus.put(routes[i][j],new ArrayList<>());
-                }
-                stopToBus.get(routes[i][j]).add(i);
-            }
-        }
-        if(!stopToBus.containsKey(source) || !stopToBus.containsKey(target))
-            return -1;
-        dfs(source,stopToBus.get(source).get(0),source,source,target,1,routes);
-        return minBus==routes.length+1?-1:minBus;
-
+public class Solution {
+    public boolean canPartition(int[] nums) {
+        Map<Integer,Map<Integer,Integer>> map=new HashMap<>();
+        boolean res=helper(nums,0,0,0,map);
+        System.out.println(map);
+        return res;
     }
-    public void dfs(int currStop,int bus,int prevStop,int source,int target,int busesTaken,int[][] routes){
-        if(currStop==target){
-            minBus=Math.min(minBus,busesTaken);
-            return;
+    public boolean helper(int[] nums,int idx,int size,int sum,Map<Integer,Map<Integer,Integer>> map){
+        if(size!=0&&size!=nums.length){
+            if(!map.containsKey(size))
+                map.put(size,new HashMap<>());
+            Map<Integer,Integer> m=map.get(size);
+            m.put(sum,m.getOrDefault(sum,0)+1);
+            int p2=nums.length-size;
+            if(map.containsKey(p2)&&p2==size&&map.get(p2).getOrDefault(sum,0)>1)
+                return true;
+            if(p2!=size&&map.containsKey(p2)&&map.get(p2).containsKey(sum))
+                return true;
         }
-        String key = "" + currStop + bus + prevStop ;
-        if(vis.containsKey(key))
-            return;
-        vis.put(key,true);
-        List<Integer> currStopBuses = stopToBus.get(currStop);
-        for(int buses:currStopBuses){
-            for(int stop:routes[buses]){
-                if((stop==currStop||stop==prevStop)&&buses==bus)
-                    continue;
-                int nextCost=bus!=buses?busesTaken+1:busesTaken;
-                dfs(stop,buses,currStop,source,target,nextCost,routes);
-            }
+        for(int i=idx;i<nums.length;++i){
+            sum+=nums[i];
+            if(helper(nums,i+1,1+size,sum,map))
+                return true;
+            sum-=nums[i];
         }
+        return false;
     }
 }
