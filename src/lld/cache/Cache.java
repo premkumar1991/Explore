@@ -1,4 +1,4 @@
-package cache;
+package lld.cache;
 
 public interface Cache<A,B> {
     void configure(Store<A,B> store, EvictionPolicy<A> evictionPolicy,int capacity);

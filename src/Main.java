@@ -1,16 +1,14 @@
-import cache.*;
+import leetcode.Problem76;
 
 public class Main {
 
     public static void main(String[] args) {
-        Cache<Integer,Integer> cache = new CacheImpl<>();
-        HashMapStore<Integer,Integer> store = new HashMapStore<>();
-        LRUEvictionPolicy<Integer> lruEvictionPolicy=new LRUEvictionPolicy<>();
-        cache.configure(store,lruEvictionPolicy,100);
-        cache.put(1,2);
-        cache.put(2,3);
-        System.out.println(cache.get(2));
-        System.out.println(lruEvictionPolicy.getEvictionKey());
+        String s = "ADOBECODEBANC", t = "ABC";
+        Problem76 p=new Problem76();
+        System.out.println(p.minWindow(s,t));
+        System.out.println(p.minWindow("a","a"));
+        System.out.println(p.minWindow("a","aa"));
     }
+
 
 }

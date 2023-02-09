@@ -1,5 +1,7 @@
-package cache;
+package lld.cache;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,25 +12,30 @@ import java.util.List;
  * @param <B>
  */
 public class LRUEvictionPolicy<A> implements EvictionPolicy<A>{
-    List<A> list;
+    HashMap<A,A> map;
     public LRUEvictionPolicy(){
-        list=new LinkedList<>();
+        map=new LinkedHashMap<>();
     }
 
     @Override
     public void delete(A key) {
-        list.remove(key);
+        map.remove(key);
     }
 
     @Override
     public void update(A key) {
-        list.remove(key);
-        list.add(key);
+        map.remove(key);
+        map.put(key,key);
     }
 
     @Override
     public A getEvictionKey() {
-        return this.list.get(0);
+        return map.get(0);
+    }
+
+    @Override
+    public boolean containsKey(A key) {
+        return map.containsKey(key);
     }
 
 }

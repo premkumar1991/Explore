@@ -1,4 +1,4 @@
-package tictactoe;
+package lld.tictactoe;
 
 public class Window {
     float width, height;

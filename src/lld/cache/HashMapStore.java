@@ -1,4 +1,4 @@
-package cache;
+package lld.cache;
 
 import java.util.HashMap;
 
@@ -27,5 +27,11 @@ public class HashMapStore<A,B> implements Store<A,B>{
     public B delete(A key) {
         return map.remove(key);
     }
+
+    @Override
+    public boolean containsKey(A key) {
+        return map.containsKey(key);
+    }
+
 
 }
