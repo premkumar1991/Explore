@@ -8,7 +8,8 @@
 * Another factory class is used to serve the Common abstraction Rate limiter
 
 ## Client code
-```RateLimiterAbstractFactory raf = new BucketRateLimiterFactory(5,3, BucketRateLimiterFactory.RefillUnits.seconds);
-        RateLimitFactory rf= RateLimiter.getRateLimiter(raf);
-        rf.canServeRequest();
-        rf.update();
+```
+  RateLimiterAbstractFactory raf = new BucketRateLimiterFactory(5,3, BucketRateLimiterFactory.RefillUnits.seconds);
+  RateLimitFactory rf= RateLimiter.getRateLimiter(raf);
+  rf.canServeRequest();
+  rf.update();
