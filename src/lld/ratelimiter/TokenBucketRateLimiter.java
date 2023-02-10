@@ -1,11 +1,11 @@
 package lld.ratelimiter;
 
-public class BucketRateLimiter implements RateLimitFactory{
+public class TokenBucketRateLimiter implements RateLimitFactory{
     long bucketSize;
     long refillCount;
     long refillBaseCount;
-    BucketRateLimiterFactory.RefillUnits refillUnits;
-    public BucketRateLimiter(long bucketSize, long refillCount, BucketRateLimiterFactory.RefillUnits refillUnits) {
+    TokenBucketRateLimiterFactory.RefillUnits refillUnits;
+    public TokenBucketRateLimiter(long bucketSize, long refillCount, TokenBucketRateLimiterFactory.RefillUnits refillUnits) {
         this.bucketSize=bucketSize;
         this.refillCount=refillCount;
         this.refillBaseCount=refillCount;
