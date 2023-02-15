@@ -1,21 +1,29 @@
-import leetcode.Problem76;
+import leetcode.Problem227;
+import leetcode.Problem547;
+import leetcode.Problem56;
+import leetcode.Problem947;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
+
 import java.util.HashSet;
+import java.util.Stack;
 
 public class Main {
 
-    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException {
-//       String[] str =  new String[]{"ab","xy","mn"};
-//       String[] str1 = new String[]{"abc","xyz"};
-//       printPossibleStrings(str1);
+    public static void main(String[] args)  {
+        Problem947 p = new Problem947();
+        p.removeStones(new int[][]{{0,0},{0,2},{1,1},{2,0},{2,2}});
+        
     }
+
+    public static void print(int[][] ans){
+        System.out.println();
+        for (int[] a:ans){
+            System.out.print(a[0]+","+a[1]+" ");
+        }
+    }
+
+
 
     public static void printPossibleStrings(String[] str){
         if(str.length==0)

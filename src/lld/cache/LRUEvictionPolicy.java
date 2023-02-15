@@ -29,13 +29,20 @@ public class LRUEvictionPolicy<A> implements EvictionPolicy<A>{
     }
 
     @Override
-    public A getEvictionKey() {
-        return map.get(0);
+    public List<A> getEvictionKeys() {
+        return List.of(map.get(0));
     }
 
     @Override
     public boolean containsKey(A key) {
         return map.containsKey(key);
+    }
+
+    @Override
+    public void deleteAll(List<A> keys) {
+        for(int i=0;i<keys.size();++i){
+            map.remove(keys.get(i));
+        }
     }
 
 }

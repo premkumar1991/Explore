@@ -1,23 +1,19 @@
 package lld.cache;
 
-public class CacheImpl<A,B> implements Cache<A,B>{
-    private Store<A,B> store;
-    private EvictionPolicy<A> evictionPolicy;
-    private int capacity;
-    private int usedCapacity=0;
-    @Override
-    public void configure(Store<A, B> store, EvictionPolicy<A> evictionPolicy,int capacity) {
-        this.store=store;
-        this.evictionPolicy=evictionPolicy;
-        this.capacity=capacity;
-    }
+public class CacheImpl<A, B> extends Cache<A, B> {
+    public Store<A, B> store;
+    public EvictionPolicy<A> evictionPolicy;
+    public int capacity;
+    public int usedCapacity = 0;
 
     @Override
     public void put(A key, B value) {
         usedCapacity++;
-        if(usedCapacity>capacity){
-           evictionPolicy.delete(evictionPolicy.getEvictionKey());
-           usedCapacity=capacity;
+        if (usedCapacity > capacity) {
+            A evictionKey = evictionPolicy.getEvictionKeys().get(0);
+            evictionPolicy.delete(evictionKey);
+            store.delete(evictionKey);
+            usedCapacity = capacity;
         }
         evictionPolicy.update(key);
         store.put(key, value);
@@ -31,9 +27,10 @@ public class CacheImpl<A,B> implements Cache<A,B>{
 
     @Override
     public B delete(A key) {
-        if(store.containsKey(key)){
+        if (store.containsKey(key)) {
             usedCapacity--;
         }
+        evictionPolicy.delete(key);
         return store.delete(key);
     }
 }

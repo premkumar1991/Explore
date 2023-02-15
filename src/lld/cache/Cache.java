@@ -1,8 +1,24 @@
 package lld.cache;
 
-public interface Cache<A,B> {
-    void configure(Store<A,B> store, EvictionPolicy<A> evictionPolicy,int capacity);
-    void put(A key,B value);
-    B get(A key);
-    B delete(A key);
+abstract class Cache<A,B> {
+    Store<A,B> store;
+    EvictionPolicy<A> evictionPolicy;
+    int capacity;
+    void configure(Store<A, B> store, EvictionPolicy<A> evictionPolicy, int capacity) {
+        this.store=store;
+        this.evictionPolicy=evictionPolicy;
+        this.capacity=capacity;
+    }
+
+    void put(A key, B value) {
+        store.put(key,value);
+    }
+
+    B get(A key) {
+        return store.get(key);
+    }
+
+    B delete(A key) {
+        return store.delete(key);
+    }
 }

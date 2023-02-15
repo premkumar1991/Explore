@@ -1,6 +1,7 @@
 package lld.cache;
 
 import java.util.HashMap;
+import java.util.List;
 
 /***
  * Can have own store like Hashmap,LinkedHashMap, TreeMap or any custom map
@@ -31,6 +32,12 @@ public class HashMapStore<A,B> implements Store<A,B>{
     @Override
     public boolean containsKey(A key) {
         return map.containsKey(key);
+    }
+
+    @Override
+    public void deleteAll(List<A> keys) {
+        for(int i=0;i<keys.size();++i)
+            map.remove(keys.get(i));
     }
 
 

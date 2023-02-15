@@ -1,8 +1,11 @@
 package lld.cache;
 
+import java.util.List;
+
 public interface EvictionPolicy<A> {
     void delete(A key);
     void update(A key);
-    A getEvictionKey();
+    List<A> getEvictionKeys();
     boolean containsKey(A key);
+    void deleteAll(List<A> keys);
 }
