@@ -17,3 +17,11 @@ public class Client {
 
     }
 }
+
+>> Output
+Observer1 received 1 messages for the event: Health
+hello
+Observer2 received 1 messages for the event: Sports
+IPL match
+Observer1 received 1 messages for the event: Health
+Healthy lifestyle program
