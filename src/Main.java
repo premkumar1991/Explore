@@ -11,8 +11,7 @@ import java.util.Stack;
 public class Main {
 
     public static void main(String[] args)  {
-        Problem947 p = new Problem947();
-        p.removeStones(new int[][]{{0,0},{0,2},{1,1},{2,0},{2,2}});
+
         
     }
 
