@@ -1,5 +1,10 @@
 package designpatterns.observer;
 
+import designpatterns.observer.newsletter.NewsEvent;
+import designpatterns.observer.newsletter.NewsEventManager;
+import designpatterns.observer.newsletter.NewsEventObserver;
+import designpatterns.observer.newsletter.NewsObserver;
+
 import java.util.List;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package designpatterns.observer;
+package designpatterns.observer.newsletter;
 
 import java.util.List;
 

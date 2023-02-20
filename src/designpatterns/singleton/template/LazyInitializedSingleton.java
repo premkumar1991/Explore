@@ -1,4 +1,4 @@
-package designpatterns.singleton;
+package designpatterns.singleton.template;
 
 public class LazyInitializedSingleton {
 

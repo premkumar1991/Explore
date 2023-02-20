@@ -2,6 +2,7 @@ import leetcode.Problem227;
 import leetcode.Problem547;
 import leetcode.Problem56;
 import leetcode.Problem947;
+import leetcode.permutations.Problem78;
 
 import java.io.IOException;
 
@@ -11,8 +12,7 @@ import java.util.Stack;
 public class Main {
 
     public static void main(String[] args)  {
-
-        
+        System.out.println(Integer.toBinaryString(8).substring(0));
     }
 
     public static void print(int[][] ans){
@@ -21,7 +21,6 @@ public class Main {
             System.out.print(a[0]+","+a[1]+" ");
         }
     }
-
 
 
     public static void printPossibleStrings(String[] str){
