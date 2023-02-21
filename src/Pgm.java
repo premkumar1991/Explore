@@ -1,30 +1,19 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pgm {
-    class TreeNode{
-        int data;
-        TreeNode left;
-        TreeNode right;
-        public TreeNode(int data){
-            this.data=data;
-        }
-    }
-    public void printIdenticalNodeParent(TreeNode root){
-        if(root!=null)
-            return;
-        if(root!=null && root.left!=null && root.right!=null && root.left.data == root.right.data){
-            System.out.println(root.data);
-        }
-        printIdenticalNodeParent(root.left);
-        printIdenticalNodeParent(root.right);
+   public static void main(String[] a){
+       List<Integer> a1=new ArrayList<>();
+       a1.addAll(List.of(1,2,3,4));
+       List<Integer> a2=a1.subList(1,3);
+       a2.set(0,-1);
+       print(a1);
 
-    }
-
-    static class Singleton{
-        private static Singleton instance=null;
-        public static synchronized Singleton getInstance(){
-            if(instance==null)
-                instance = new Singleton();
-            return instance;
+   }
+    public static void print(List<Integer> list){
+        for(Integer a: list){
+            System.out.println(a);
         }
     }
 }
+

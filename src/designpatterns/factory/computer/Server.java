@@ -1,4 +1,4 @@
-package designpatterns.factory.template.computerfactory;
+package designpatterns.factory.computer;
 
 public class Server implements ComputerFactory{
     private int ram,hdd;

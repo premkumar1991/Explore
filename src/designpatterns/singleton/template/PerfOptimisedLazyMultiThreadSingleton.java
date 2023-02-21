@@ -1,6 +1,8 @@
 package designpatterns.singleton.template;
 
-public class PerfOptimisedLazyMultiThreadSingleton {
+import java.io.Serializable;
+
+public class PerfOptimisedLazyMultiThreadSingleton implements Cloneable, Serializable {
     private static PerfOptimisedLazyMultiThreadSingleton instance;
 
     private PerfOptimisedLazyMultiThreadSingleton(){}
@@ -16,6 +18,14 @@ public class PerfOptimisedLazyMultiThreadSingleton {
                     instance=new PerfOptimisedLazyMultiThreadSingleton();
             }
         }
+        return instance;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
+    public Object readResolve(){
         return instance;
     }
 }

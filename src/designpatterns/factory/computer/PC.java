@@ -1,4 +1,4 @@
-package designpatterns.factory.template.computerfactory;
+package designpatterns.factory.computer;
 
 public class PC implements ComputerFactory {
     private int ram;

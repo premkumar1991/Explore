@@ -1,4 +1,4 @@
-package designpatterns.observer;
+package designpatterns.observer.newsletter;
 
 import designpatterns.observer.newsletter.NewsEvent;
 import designpatterns.observer.newsletter.NewsEventManager;
