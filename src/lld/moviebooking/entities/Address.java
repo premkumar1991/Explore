@@ -1,9 +1,12 @@
 package lld.moviebooking.entities;
 
 public class Address {
-    String streetName;
+    String addressLine1;
+    String addressLine2;
     String pinCode;
     City city;
+
+    GpsLocation gpsLocation;
 
     public City getCity() {
         return city;
@@ -13,7 +16,4 @@ public class Address {
         return pinCode;
     }
 
-    public String getStreetName() {
-        return streetName;
-    }
 }

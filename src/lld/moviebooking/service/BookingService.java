@@ -70,7 +70,7 @@ public class BookingService {
                 filter(preBooking -> preBooking.getShowScreen().getTheatre().getId().equals(showScreen.getTheatre().getId())).toList();
         List<Seat> filteredSeats = new ArrayList<>();
         for(PreBooking preBooking:preBookingsFiltered){
-            if(!preBooking.getCustomer().getUserId().equals(customer.getUserId())){
+            if(!preBooking.getCustomer().getId().equals(customer.getId())){
                 filteredSeats.addAll(preBooking.getPreBookedSeats().stream().filter(seat -> hasMatchingSeat(bookingSeats,seat)).toList());
             }
         }

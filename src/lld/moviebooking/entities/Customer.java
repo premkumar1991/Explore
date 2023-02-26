@@ -1,7 +1,7 @@
 package lld.moviebooking.entities;
 
 public class Customer {
-    String userId;
+    String id;
     String name;
     String phoneNo;
 
@@ -9,7 +9,7 @@ public class Customer {
         return name;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 }

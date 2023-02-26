@@ -1,6 +1,6 @@
 package lld.moviebooking.entities;
 
-public class Location {
+public class GpsLocation {
     float latitude;
     float longitude;
 }

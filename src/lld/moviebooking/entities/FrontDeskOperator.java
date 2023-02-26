@@ -1,6 +1,6 @@
 package lld.moviebooking.entities;
 
-public class FrontDeskOperator {
-    private String loginId;
-    private String password;
+import java.util.List;
+
+public class FrontDeskOperator extends Account{
 }

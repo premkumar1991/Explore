@@ -9,11 +9,12 @@
 
 
 # learnings 
-  controller, service and middleware patterns seems good for scale
-  entity should be strict, no other responsibility should be added to it, introduce mapping service and mapping entity when your service needs it
-  could forsee getters,setters constructor injection can be optimised using advance annotation
-  streams, collections api should be practised well 
+- controller, service and middleware patterns seems good for scale
+- entity should be strict, no other responsibility should be added to it, introduce mapping service and mapping entity when your service needs it
+-  getters,setters constructor injection and boilerplate code can be optimised using advance annotation
+-  streams, collections api should be practised well 
 
-  Think how other patterns work and framework are used for scale to avoid boilerplate
+# next action item
+Think how other patterns work and framework are used for scale to avoid boilerplate
 
 
