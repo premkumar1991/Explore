@@ -3,6 +3,7 @@ package lld.moviebooking.service;
 import lld.moviebooking.entities.*;
 import lld.moviebooking.exceptions.SeatAllocationException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +23,8 @@ public class BookingService {
         for (Seat seat:seats){
             seat.setStatus(SeatStatus.Created);
         }
-        return new PreBooking(seats,showScreen,customer);
+        PreBooking currentPreBooking = new PreBooking(seats,showScreen,customer);
+        return currentPreBooking;
     }
 
     public  Booking createBooking(final PreBooking preBooking) throws SeatAllocationException {
@@ -38,8 +40,18 @@ public class BookingService {
         return new Booking(UUID.randomUUID().toString(),preBooking.getShowScreen(),seats,preBooking.getCustomer());
     }
 
+    // mock pre-booking, in reality it asks middleware for pre-booking list in turn middle ware contacts db/respective store to retrieve details
+    private List<PreBooking> getAllPreBookings(){
+        ShowScreen showScreen = new ShowScreen("show_id",
+                new Date(),
+                new Screen("id","name",List.of(new Seat())),
+                new Theatre(),
+                new Movie("id","name", Duration.ofHours(2).toMillis(),List.of(new City()))
+        );
+        return List.of(new PreBooking(List.of(new Seat()), showScreen, new Customer()));
+    }
     private boolean hasPreBookingSeatsExists(PreBooking preBooking){
-        List<PreBooking> preBookings = List.of(new PreBooking(List.of(new Seat()), preBooking.getShowScreen(), new Customer()));
+        List<PreBooking> preBookings = getAllPreBookings();
         List<PreBooking> preBookingsFiltered = preBookings
                 .stream()
                 .filter(preBooking1 -> checkPreBookingConstraints(preBooking1, preBooking.getShowScreen())).toList();

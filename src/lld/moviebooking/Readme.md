@@ -14,6 +14,9 @@
 -  getters,setters constructor injection and boilerplate code can be optimised using advance annotation
 -  streams, collections api should be practised well 
 
+# Generalisation tips
+- Think Theatre as Some Venue, Screen as VenueRooms to make generic abstraction
+
 # next action item
 Think how other patterns work and framework are used for scale to avoid boilerplate
 
