@@ -3,11 +3,10 @@ package lld.moviebooking.entities;
 import java.util.List;
 
 public class Theatre {
-    String id;
-    TheatreStatus status;
-    List<Movie> movies;
-    List<Screen> screens;
-    City city;
+    private String id;
+    private TheatreStatus status;
+    private List<Screen> screens;
+    private Address address;
 
     public List<Screen> getScreens() {
         return screens;
@@ -17,11 +16,11 @@ public class Theatre {
         return id;
     }
 
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
     public TheatreStatus getStatus() {
         return status;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 }

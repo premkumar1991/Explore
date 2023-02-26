@@ -34,4 +34,8 @@ public class Seat {
     public String getRow() {
         return row;
     }
+
+    public void setStatus(SeatStatus status) {
+        this.status = status;
+    }
 }

@@ -1,27 +1,23 @@
 package lld.moviebooking.entities;
 
-import java.time.Duration;
 import java.util.List;
 
 public class Movie {
     String id;
     String name;
     long durationInMilliSecs;
-    List<City> city;
+    List<City> releaseLocation;
+
     // Todo: Using constructor for initialisation now, but model class are a candidate for builder
-    public Movie(String id,String name,long durationInMilliSecs,List<City> city){
+    public Movie(String id,String name,long durationInMilliSecs,final List<City> releaseLocation){
         this.id=id;
-        this.city=city;
         this.name=name;
         this.durationInMilliSecs=durationInMilliSecs;
+        this.releaseLocation=releaseLocation;
     }
 
     public String getId() {
         return id;
-    }
-
-    public List<City> getCity() {
-        return city;
     }
 
     public long getDurationInMilliSecs() {
@@ -30,5 +26,9 @@ public class Movie {
 
     public String getName() {
         return name;
+    }
+
+    public List<City> getReleaseLocation() {
+        return releaseLocation;
     }
 }

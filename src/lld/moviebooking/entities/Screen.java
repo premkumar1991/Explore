@@ -3,12 +3,16 @@ package lld.moviebooking.entities;
 import java.util.List;
 
 public class Screen {
-    String id;
-    String name;
-    List<Seat> seats;
-    Movie movie;
-    Theatre theatre;
+    private String id;
+    private String name;
+    private List<Seat> seats;
+    public Screen(String id,String name,List<Seat> seats){
+        this.id=id;
+        this.name=name;
+        this.seats=seats;
+    }
 
+    Show show;
     public String getId() {
         return id;
     }
@@ -20,11 +24,8 @@ public class Screen {
     public List<Seat> getSeats() {
         return seats;
     }
-    public Movie getMovie() {
-        return movie;
-    }
 
-    public Theatre getTheatre() {
-        return theatre;
+    public Show getShow() {
+        return show;
     }
 }

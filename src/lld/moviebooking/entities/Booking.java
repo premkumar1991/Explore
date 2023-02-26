@@ -15,11 +15,13 @@ import java.util.List;
 //why don't i keep Screen entity,Customer
 public class Booking {
     private String bookingId;
-    private Screen screen;
+    private ShowScreen showScreen;
+    private List<Seat> bookedSeats;
     private Customer customer;
-    public Booking(String bookingId,Screen screen,Customer customer){
+    public Booking(String bookingId,final ShowScreen showScreen,final List<Seat> bookedSeats,final Customer customer){
         this.bookingId=bookingId;
-        this.screen=screen;
+        this.showScreen=showScreen;
+        this.bookedSeats=bookedSeats;
         this.customer=customer;
     }
 

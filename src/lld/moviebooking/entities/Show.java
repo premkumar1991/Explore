@@ -1,21 +1,17 @@
 package lld.moviebooking.entities;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 public class Show {
-    String id;
-    OffsetDateTime time;
-    Screen screen;
+    protected String id;
+    protected Date time;
 
     public String getId() {
         return id;
     }
 
-    public OffsetDateTime getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public Screen getScreen() {
-        return screen;
-    }
 }
