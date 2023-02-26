@@ -1,6 +1,7 @@
 package lld.moviebooking.service;
 
 import lld.moviebooking.entities.*;
+import lld.moviebooking.exceptions.SeatAllocationException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,9 +15,9 @@ public class BookingService {
     // 2. prebooking table -> has unique id constraints on three columns <theatre_id,screen_id,seat_id> user_id
     // 3. row lock
 
-    public PreBooking createPreBooking(final Customer customer, final ShowScreen showScreen, final List<Seat> bookingSeats){
+    public PreBooking createPreBooking(final Customer customer, final ShowScreen showScreen, final List<Seat> bookingSeats) throws SeatAllocationException {
         if(!isSeatAvailableForPreBooking(showScreen,bookingSeats,customer))
-            throw new IllegalStateException("Seat conflicted");
+            throw new SeatAllocationException("Seat Prebooking failed", null);
         List<Seat> seats=bookingSeats;
         for (Seat seat:seats){
             seat.setStatus(SeatStatus.Created);
@@ -24,11 +25,11 @@ public class BookingService {
         return new PreBooking(seats,showScreen,customer);
     }
 
-    public  Booking createBooking(final PreBooking preBooking){
+    public  Booking createBooking(final PreBooking preBooking) throws SeatAllocationException {
         // check if seats are available in pre-booking table for the customer and seats are in created state
         // if all seats are available in pre-booking table then we can book, otherwise fail the request
         if(!hasPreBookingSeatsExists(preBooking)){
-            throw new IllegalStateException("Seat not available or locked seats cleared");
+            throw new SeatAllocationException("Seat allocation conflicting with other user", null);
         }
         List<Seat> seats=preBooking.getPreBookedSeats();
         for (Seat seat:seats){

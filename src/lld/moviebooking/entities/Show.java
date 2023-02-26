@@ -4,14 +4,18 @@ import java.util.Date;
 
 public class Show {
     protected String id;
-    protected Date time;
+    protected Date startTime;
+    protected Date endTime;
 
     public String getId() {
         return id;
     }
 
     public Date getTime() {
-        return time;
+        return startTime;
     }
 
+    public Date getEndTime() {
+        return endTime;
+    }
 }

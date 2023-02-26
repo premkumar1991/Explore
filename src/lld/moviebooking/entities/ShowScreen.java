@@ -7,11 +7,13 @@ public class ShowScreen {
     Date showTime;
     Screen screen;
     Theatre theatre;
-    public ShowScreen(String showId,Date showTime,Screen screen,Theatre theatre){
+    Movie movie;
+    public ShowScreen(String showId,Date showTime,Screen screen,Theatre theatre,Movie movie){
         this.showId=showId;
         this.showTime=showTime;
         this.screen=screen;
         this.theatre=theatre;
+        this.movie=movie;
     }
 
     public Screen getScreen() {

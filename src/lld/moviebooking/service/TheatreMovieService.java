@@ -7,6 +7,7 @@ import lld.moviebooking.entities.ShowScreen;
 import lld.moviebooking.entities.Theatre;
 
 
+import java.time.Duration;
 import java.util.List;
 
 public class TheatreMovieService {
@@ -28,11 +29,20 @@ public class TheatreMovieService {
         return !cities.stream().filter(city -> city.getId()==searchCity.getId()).toList().isEmpty();
     }
 
-    public List<ShowScreen> getAllShowsInTheatre(Theatre theatre){
+    // Theatre Movie relation service api, ShowScreen enii
+    public List<ShowScreen> getAllShowsInTheatre(Theatre theatre, Movie movie){
         return theatre.
                 getScreens().
                 stream().
-                map(screen -> new ShowScreen(screen.getShow().getId(),screen.getShow().getTime(),screen,theatre)).
+                map(screen ->
+                        new ShowScreen(
+                                screen.getShow().getId(),
+                                screen.getShow().getTime(),
+                                screen,
+                                theatre,
+                                movie
+                        )
+                ).
                 toList();
     }
 }
