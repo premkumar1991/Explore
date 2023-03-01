@@ -21,3 +21,8 @@
 Think how other patterns work and framework are used for scale to avoid boilerplate
 
 
+# Patterns
+  MVC
+  Repository
+  DTO
+  DAO
