@@ -1,0 +1,49 @@
+@startuml
+class User{
+    - id: long
+    - name: String
+    + User(id: long, name: String)
+    + getId(): long
+    + getName(): String
+}
+interface BaseCRUDDao<T> {
+    + add(entity : T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+    + getById(id: long): T
+    + getAll(): List<T>
+}
+interface CustomDao<T>{
+    +search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+class UserDaoImpl<User> implements BaseCRUDDao, CustomDao{
+    + add((entity: User): void
+    + remove(entity: User): void
+    + update(id: long, entity: User): User
+    + getById(id: long): User
+    + getAll(): List<User>
+    + search(filterStrategy:FilterStrategyProvider<User>): List<User>
+}
+'Looks like base repository repeats all operation in base_crud_dao
+interface BaseRepository<T>{
+    + add(entity: T): void
+    + remove((entity: T): void
+    + update(id: long, entity: T): T
+    + get(id: long): T
+    + getAll(): List<T>
+}
+interface CustomRepository<T>{
+    +search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+class UserRepository<User> implements BaseRepository, CustomRepository{
+    - userDaoImpl: UserDaoImpl
+    + UserRepository(userDao: UserDao)
+    + add(entity: User): void
+    + remove((entity: User): void
+    + update(id: long, entity: User): User
+    + get(id: long): User
+    + getAll(): List<User>
+    + search(filterStrategy: FilterStrategyProvider<User>): List<User>
+}
+UserRepository o-- UserDaoImpl : aggregation
+@enduml
