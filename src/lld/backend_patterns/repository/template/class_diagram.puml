@@ -1,4 +1,92 @@
 @startuml
+interface IReadDao<T>{
+    + getById(id: long): T
+    + getAll(): List<T>
+}
+interface IWriteDao<T>{
+    + add(entity : T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+}
+interface ICustomDao<T>{
+    + search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+interface IBaseReadRepository {
+    + getById(id: long): T
+    + getAll(): List<T>
+}
+interface IBaseWriteRepository{
+    + add(entity : T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+}
+interface ICustomRepository<T>{
+    + search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+class ReadDao<T> implements IReadDao{
+    + getById(id: long): T
+    + getAll(): List<T>
+}
+class WriteDao<T> implements IWriteDao{
+    + add(entity : T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+}
+class CustomDao<T> implements ICustomDao{
+    + search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+class BaseReadRepository<T> implements IBaseReadRepository{
+    # readDao: ReadDao<T>
+    + BaseReadRepository(readDao: ReadDao<T>)
+    + getById(id: long): T
+    + getAll(): List<T>
+}
+class BaseWriteRepository<T> implements IBaseWriteRepository{
+    # writeDao: writeDao<T>
+    + BaseWriteRepository(writeDao: WriteDao<T>)
+    + add(entity : T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+}
+class BaseCustomRepository<T> implements ICustomRepository{
+    # customDao: CustomDao
+    + search(filterStrategy: FilterStrategyProvider<T>): List<T>
+}
+
+'Service will get respective type bounded BaseRepository
+'MasterRepository has all read,write,custom repository injection on generic type for scale
+'Have some builder pattern around MasterRepository to allow scope of optional repository injection while creation
+class MasterRepository<T> implements IBaseReadRepository, IBaseWriteRepository, ICustomRepository{
+    # readRepository: IBaseReadRepository<T>
+    # writeRepository: IBaseWriteRepository<T>
+    # customRepository: ICustomRepository<T>
+    + BaseRepository(readRepository: IBaseReadRepository<T>, writeRepository: IBaseWriteRepository<T>, customRepository: ICustomRepository<T>)
+    + add(entity: T): void
+    + remove((entity: T): void
+    + update(id: long, entity: T): T
+    + getById(id: long): T
+    + getAll(): List<T>
+    + search(filterStrategy: FilterStrategyProvider<T>): List<T>
+}
+class InMemoryMasterRepository<T> extends MasterRepository{
+    # list: List<T>
+    + InMemoryMasterRepository(readRepository: IBaseReadRepository<T>, writeRepository: IBaseWriteRepository<T>, customRepository: ICustomRepository<T>)
+}
+class MasterService<T>{
+    # masterRepository: MasterRepository<T>
+    + MasterService(masterRepository: MasterRepository)
+    + add(entity: T): void
+    + remove(entity: T): void
+    + update(id: long, entity: T): T
+    + getById(id: long): T
+    + getAll(): List<T>
+    + search(filterStrategy:FilterStrategyProvider<T>): List<T>
+}
+'Composition of UserService in constructor
+class UserApi {
+    # masterUserService: MasterService<User>
+    + UserApi()
+}
 class User{
     - id: long
     - name: String
@@ -6,44 +94,35 @@ class User{
     + getId(): long
     + getName(): String
 }
-interface BaseCRUDDao<T> {
-    + add(entity : T): void
-    + remove(entity: T): void
-    + update(id: long, entity: T): T
-    + getById(id: long): T
-    + getAll(): List<T>
-}
-interface CustomDao<T>{
-    +search(filterStrategy:FilterStrategyProvider<T>): List<T>
-}
-class UserDaoImpl<User> implements BaseCRUDDao, CustomDao{
-    + add((entity: User): void
-    + remove(entity: User): void
-    + update(id: long, entity: User): User
-    + getById(id: long): User
-    + getAll(): List<User>
-    + search(filterStrategy:FilterStrategyProvider<User>): List<User>
-}
-'Looks like base repository repeats all operation in base_crud_dao
-interface BaseRepository<T>{
-    + add(entity: T): void
-    + remove((entity: T): void
-    + update(id: long, entity: T): T
-    + get(id: long): T
-    + getAll(): List<T>
-}
-interface CustomRepository<T>{
-    +search(filterStrategy:FilterStrategyProvider<T>): List<T>
-}
-class UserRepository<User> implements BaseRepository, CustomRepository{
-    - userDaoImpl: UserDaoImpl
-    + UserRepository(userDao: UserDao)
-    + add(entity: User): void
-    + remove((entity: User): void
-    + update(id: long, entity: User): User
-    + get(id: long): User
-    + getAll(): List<User>
-    + search(filterStrategy: FilterStrategyProvider<User>): List<User>
-}
-UserRepository o-- UserDaoImpl : aggregation
+'class UserDaoImpl<User> extends BaseCRUDDao{
+'    + add((entity: User): void
+'    + remove(entity: User): void
+'    + update(id: long, entity: User): User
+'    + getById(id: long): User
+'    + getAll(): List<User>
+'    + search(filterStrategy:FilterStrategyProvider<User>): List<User>
+'}
+'class UserRepository<User> extends BaseRepository{
+'    - userDaoImpl: UserDaoImpl
+'    + UserRepository(userDao: UserDao)
+'    + add(entity: User): void
+'    + remove((entity: User): void
+'    + update(id: long, entity: User): User
+'    + get(id: long): User
+'    + getAll(): List<User>
+'    + search(filterStrategy: FilterStrategyProvider<User>): List<User>
+'}
+'UserDao relation
+'UserRepository o-- UserDaoImpl : aggregation
+'UserDaoImpl --> BaseCRUDDao
+'UserDaoImpl ..> CustomDao
+
+'UserRepository relation
+'UserRepository --> BaseRepository
+'UserRepository ..> CustomRepository
+
+UserApi *-- "1..1" MasterService : has one_to_one
+MasterService "1" o-- "1" MasterRepository : has one_to_one
+
+
 @enduml
