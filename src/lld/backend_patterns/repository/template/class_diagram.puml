@@ -94,32 +94,6 @@ class User{
     + getId(): long
     + getName(): String
 }
-'class UserDaoImpl<User> extends BaseCRUDDao{
-'    + add((entity: User): void
-'    + remove(entity: User): void
-'    + update(id: long, entity: User): User
-'    + getById(id: long): User
-'    + getAll(): List<User>
-'    + search(filterStrategy:FilterStrategyProvider<User>): List<User>
-'}
-'class UserRepository<User> extends BaseRepository{
-'    - userDaoImpl: UserDaoImpl
-'    + UserRepository(userDao: UserDao)
-'    + add(entity: User): void
-'    + remove((entity: User): void
-'    + update(id: long, entity: User): User
-'    + get(id: long): User
-'    + getAll(): List<User>
-'    + search(filterStrategy: FilterStrategyProvider<User>): List<User>
-'}
-'UserDao relation
-'UserRepository o-- UserDaoImpl : aggregation
-'UserDaoImpl --> BaseCRUDDao
-'UserDaoImpl ..> CustomDao
-
-'UserRepository relation
-'UserRepository --> BaseRepository
-'UserRepository ..> CustomRepository
 
 UserApi *-- "1..1" MasterService : has one_to_one
 MasterService "1" o-- "1" MasterRepository : has one_to_one
