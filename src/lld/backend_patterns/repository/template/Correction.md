@@ -4,6 +4,76 @@
 # DTO question
 - Q: What is the best practises for DTO objects for 2 or more entity relation?
 - A: DTO can have builder pattern to build required inputs if it seems to more combinations
+- Q: Is Deserialization of json to builder possible?
+- A: Yes, no arg constructor and static builder class is a way for parser.
+- Q: Example
+A: 
+```
+>> invoking code on deserialization
+ObjectMapper mapper = new ObjectMapper();
+Person person = mapper.readValue(jsonString, Person.Builder.class).build();
+
+>> json
+{
+  "name": "John",
+  "age": 30,
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zip": "12345"
+  }
+}
+
+>> builder
+public class Person {
+    private String name;
+    private int age;
+    private Address address;
+
+    private Person(Builder builder) {
+        name = builder.name;
+        age = builder.age;
+        address = builder.address;
+    }
+
+    public static class Builder {
+        private String name;
+        private int age;
+        private Address address;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder age(int age) {
+            this.age = age;
+            return this;
+        }
+
+        public Builder address(Address address) {
+            this.address = address;
+            return this;
+        }
+
+        public Person build() {
+            return new Person(this);
+        }
+    }
+
+    // getters and setters omitted for brevity
+
+    public static class Address {
+        private String street;
+        private String city;
+        private String state;
+        private String zip;
+
+        // getters and setters omitted for brevity
+    }
+}
+```
 
 # Exceptional handling in DAO, repository, service and controller 
     controller layer
