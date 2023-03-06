@@ -89,7 +89,7 @@ class MasterService<T>{
 'Rest api request handler/controller create service instance (composition) bootstrap phase
 class RestController {
     # masterUserService: MasterService<User>
-    + UserApi()
+    + RestController()
 }
 class User{
     - id: long
