@@ -1,0 +1,28 @@
+@startuml
+interface Subject{
+    addObserver(Observer observer): void
+    removeObserver(Observer observer): void
+    notifyObserver(): void
+    setState(Object o): void
+}
+interface Observer{
+    update(Object o): void
+}
+class SubjectImpl implements Subject{
+    - state: Object
+    - observer: Set<Observer>
+    + SubjectImpl()
+    + addObserver(Observer observer): void
+    + removeObserver(Observer observer): void
+    + notifyObserver(): void
+    + setState(Object o): void
+}
+class ObserverImpl implements Observer{
+    - observerName: String
+    + ObserverImpl(observerName: String)
+    + update(Object o)
+}
+'Relationship between classes
+Subject o-- "1..1" Observer : aggregation
+SubjectImpl o-- "1..*" Observer : aggregation
+@enduml
