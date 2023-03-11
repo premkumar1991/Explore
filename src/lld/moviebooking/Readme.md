@@ -1,7 +1,7 @@
 # services
 - get movies showing in the city - done, movie_service alone return all movies matching the input city from client
 - get theatres showing the movie with the selected city - done, separate theatre_movie service is created to get computed results from movie and theatre service
-- get shows available in the selected theatre - done, mapping entity ShowScreen created to link between show and screen as we don't have show to screen link
+- get all shows available in the selected theatre - done, mapping entity ShowScreen created to link between show and screen as we don't have show to screen link
 - get all seats available for the show - done, theatre will have list of screen and each screen will have seat information
 - select seat and book seat for the show - done
   - pre-booking happens first, lock seats for concurrency(various methods are there)
