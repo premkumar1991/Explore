@@ -38,7 +38,6 @@ package com.movie_booking.entity.main{
     class Country extends Identifier{
     }
 
-    'Theatre and theatreGroupId acts as composite key
     class Theatre extends Identifier {
         - theatreGroupId: long
         - address: Address
