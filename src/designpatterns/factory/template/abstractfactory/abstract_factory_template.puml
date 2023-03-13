@@ -1,0 +1,23 @@
+@startuml
+interface AbstractFactory{
+    + create(): Factory
+}
+class AbstractFactoryImpl implements AbstractFactory{
+    - implState: Object
+    + AbstractFactory(implState: Object)
+    + create(): Factory
+}
+interface Factory{
+    + operation(): void
+}
+class FactoryImpl implements Factory{
+    - implState: Object
+    + FactoryImpl(implState: Object)
+    + operation(): void
+}
+class FactoryClient{
+    + staticGetMethod(abstractFactory: AbstractFactory): Factory
+}
+'Relationship between classes
+FactoryClient o-- "1..1" AbstractFactory
+@enduml
