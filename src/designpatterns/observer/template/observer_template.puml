@@ -23,6 +23,6 @@ class ObserverImpl implements Observer{
     + update(Object o)
 }
 'Relationship between classes
-Subject o-- "1..1" Observer : aggregation
+Subject o.. "1..1" Observer : aggregation
 SubjectImpl o-- "1..*" Observer : aggregation
 @enduml
