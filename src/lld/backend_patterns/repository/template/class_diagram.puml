@@ -23,36 +23,40 @@ interface IBaseWriteRepository{
 interface ICustomRepository<T>{
     + search(filterStrategy:FilterStrategyProvider<T>): List<T>
 }
-class ReadDao<T> implements IReadDao{
+class DBReadDao<T> implements IReadDao{
+    - connection: Connection
+    + DBReadDao()
     + getById(id: long): T
     + getAll(): List<T>
 }
-class WriteDao<T> implements IWriteDao{
+class DBWriteDao<T> implements IWriteDao{
+    - connection: Connection
+    + DBWriteDao()
     + add(entity : T): void
     + remove(entity: T): void
     + update(id: long, entity: T): T
 }
-class CustomDao<T> implements ICustomDao{
+class DBCustomDao<T> implements ICustomDao{
+    - connection: Connection
     + search(filterStrategy:FilterStrategyProvider<T>): List<T>
 }
 class BaseReadRepository<T> implements IBaseReadRepository{
-    # readDao: ReadDao<T>
-    + BaseReadRepository(readDao: ReadDao<T>)
+    # readDao: IReadDao<T>
+    + BaseReadRepository(readDao: IReadDao<T>)
     + getById(id: long): T
     + getAll(): List<T>
 }
 class BaseWriteRepository<T> implements IBaseWriteRepository{
-    # writeDao: writeDao<T>
-    + BaseWriteRepository(writeDao: WriteDao<T>)
+    # writeDao: IWriteDao<T>
+    + BaseWriteRepository(writeDao: IWriteDao<T>)
     + add(entity : T): void
     + remove(entity: T): void
     + update(id: long, entity: T): T
 }
 class BaseCustomRepository<T> implements ICustomRepository{
-    # customDao: CustomDao
+    # customDao: ICustomDao
     + search(filterStrategy: FilterStrategyProvider<T>): List<T>
 }
-
 'Service will get respective type bounded BaseRepository
 'MasterRepository has all read,write,custom repository injection on generic type for scale
 'Have some builder pattern around MasterRepository to allow scope of optional repository injection while creation
@@ -74,7 +78,7 @@ class InMemoryMasterRepository<T> extends MasterRepository{
 }
 class MasterService<T>{
     # masterRepository: MasterRepository<T>
-    + MasterService(masterRepository: MasterRepository)
+    + MasterService(masterRepository: MasterRepository<T>)
     + add(entity: T): void
     + remove(entity: T): void
     + update(id: long, entity: T): T
@@ -82,8 +86,8 @@ class MasterService<T>{
     + getAll(): List<T>
     + search(filterStrategy:FilterStrategyProvider<T>): List<T>
 }
-'Composition of UserService in constructor
-class UserApi {
+'Rest api request handler/controller create service instance (composition) bootstrap phase
+class RestController {
     # masterUserService: MasterService<User>
     + UserApi()
 }
@@ -95,8 +99,10 @@ class User{
     + getName(): String
 }
 
-UserApi *-- "1..1" MasterService : has one_to_one
-MasterService "1" o-- "1" MasterRepository : has one_to_one
-
-
+RestController *-- "1..1" MasterService : composition
+MasterService o-- "1..1" MasterRepository : aggregation
+BaseReadRepository o-- "1..1" IReadDao : aggregation
+BaseWriteRepository o-- "1..1" IWriteDao
+BaseCustomRepository o-- "1..1" ICustomDao
+'ClassA --> "1..*" ClassB : abc
 @enduml
