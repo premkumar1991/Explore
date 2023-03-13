@@ -1,0 +1,18 @@
+@startuml
+interface Factory{
+    + operation(): void
+}
+class FactoryClient{
+    + staticGetMethod(type: factoryTypeEnum): Factory
+}
+class FactoryImpl1 implements Factory{
+    + FactoryImpl1()
+    + operation(): void
+}
+class FactoryImpl2 implements Factory{
+    + FactoryImpl2()
+    + operation(): void
+}
+'Relationship between classes
+FactoryClient o-- "1..1" Factory
+@enduml
