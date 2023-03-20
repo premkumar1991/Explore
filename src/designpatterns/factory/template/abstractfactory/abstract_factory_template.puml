@@ -18,6 +18,4 @@ class FactoryImpl implements Factory{
 class FactoryClient{
     + staticGetMethod(abstractFactory: AbstractFactory): Factory
 }
-'Relationship between classes
-FactoryClient o-- "1..1" AbstractFactory
 @enduml
