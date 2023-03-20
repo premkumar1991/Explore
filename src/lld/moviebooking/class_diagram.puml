@@ -1,29 +1,39 @@
 @startuml
 'Main Entity and Relational mapping entity
 
-package com.movie_booking.entity.main{
-    class Identifier{
-        - id: long
-        - name: String
+package com.movie_booking.models{
+'package com.movie_booking.models.main{
+    abstract class Identifier{
+        # id: long
+        # name: String
+        + getId(): long
+        + getName(): String
     }
     class User extends Identifier{
         - email: String
         - phoneNo: String
     }
     class Movie extends Identifier{
-        - crew: List<Crew>
+        - crewCast: List<CrewCast>
         - supportedLanguages: List<LanguageCode>
     }
-    class Crew extends Identifier{
-        - crewType: CrewType
+    class CrewCast extends Identifier{
+        - crewCastType: CrewCastType
     }
-    enum CrewType{
-        Cameraman
-        Designer
-        Hero
-        Heroine
-        Director
-        Singer
+    enum CrewCastType{
+        Cameraman(MovieMemberType.Crew)
+        Designer(MovieMemberType.Crew)
+        Director(MovieMemberType.Crew)
+        Singer(MovieMemberType.Crew)
+        Hero(MovieMemberType.Cast)
+        Heroine(MovieMemberType.Cast)
+        - <<final>> movieMemberType: MovieMemberType
+        + CrewCastType(movieMemberType: movieMemberType)
+        + getMovieMemberType(): MovieMemberType
+    }
+    enum MovieMemberType{
+         Crew,
+         Cast
     }
     'Todo: Preferred hierarchical approach, should discuss and final best entity design for city state, this takes four level joins
     class District extends Identifier{
@@ -37,7 +47,6 @@ package com.movie_booking.entity.main{
     }
     class Country extends Identifier{
     }
-
     class Theatre extends Identifier {
         - theatreGroupId: long
         - address: Address
@@ -87,9 +96,9 @@ package com.movie_booking.entity.main{
         - showTime: LocalDateTime
         - screenId: long
     }
-}
+'}
 
-package com.movie_booking.entity.mapping{
+'package com.movie_booking.models.mapping{
     class Booking {
         - bookingId: long
         - showId: long
@@ -123,10 +132,17 @@ package com.movie_booking.entity.mapping{
         cityId: long
         releaseTime: LocalDateTime
     }
+'}
+}
+package com.movie_booking.dao.common{
+    abstract class DBDao{
+        # connection: Connection
+        + DBDao()
+    }
 }
 package com.movie_booking.dao.main{
     interface ReadDao<T>{
-        + findById(id: long): T
+        + findById(id: long): Optional<T>
         + findAll(): List<T>
     }
     interface WriteDao<T>{
@@ -134,92 +150,83 @@ package com.movie_booking.dao.main{
         + update(id: long, entity: T): T
         + delete(id: long): boolean
     }
-    class DBReadUserDao<User> implements ReadDao{
-        - connection: Connection
-        + DBUserWriteDao()
-        + findById(id: long): User
+    class DBReadUserDao<User> extends com.movie_booking.dao.common.DBDao implements ReadDao{
+        + DBReadUserDao()
+        + findById(id: long): Optional<User>
         + findAll(): List<User>
     }
-    class DBUserWriteDao<User> implements WriteDao{
-       - connection: Connection
+    class DBUserWriteDao<User> extends com.movie_booking.dao.common.DBDao implements WriteDao{
        + DBUserWriteDao()
        + create(user: User): User
        + update(id: long, user: User): User
        + delete(id: long): boolean
     }
-    class DBMovieReadDao<Movie> implements ReadDao{
-        - connection: Connection
+    class DBMovieReadDao<Movie> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBMovieReadDao()
         + findAll(): List<Movie>
-        + findById(id: long): List<Movie>
+        + findById(id: long): Optional<Movie>
     }
-    class DBMovieWriteDao<Movie> implements WriteDao{
-        - connection: Connection
+    class DBCityReadDao<City> extends com.movie_booking.dao.common.DBDao implements ReadDao{
+        + DBCityReadDao()
+        + findAll(): List<City>
+        + findById(id: long): Optional<City>
+    }
+    class DBMovieWriteDao<Movie> extends com.movie_booking.dao.common.DBDao implements WriteDao{
         + DBMovieCityWriteDao()
         + create(movie: Movie): Movie
         + update(id: long, movie: Movie): Movie
         + delete(id: long): boolean
     }
-    class DBTheatreReadDao<Theatre> implements ReadDao{
-        - connection: Connection
+    class DBTheatreReadDao<Theatre> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBTheatreReadDao()
         + findAll(): List<Theatre>
-        + findById(id: long): List<Theatre>
+        + findById(id: long): Optional<Theatre>
     }
     class DBTheatreWriteDao<Theatre> implements WriteDao{
-        - connection: Connection
         + DBTheatreWriteDao()
         + create(movie: Theatre): Theatre
         + update(id: long, movie: Theatre): Theatre
         + delete(id: long): boolean
     }
-    class DBTheatreGroupReadDao<TheatreGroup> implements ReadDao{
-        - connection: Connection
+    class DBTheatreGroupReadDao<TheatreGroup> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBTheatreGroupReadDao()
         + findAll(): List<TheatreGroup>
-        + findById(id: long): TheatreGroup
+        + findById(id: long): Optional<TheatreGroup>
     }
-    class DBTheatreGroupWriteDao<TheatreGroup> implements WriteDao{
-        - connection: Connection
+    class DBTheatreGroupWriteDao<TheatreGroup> extends com.movie_booking.dao.common.DBDao implements WriteDao{
         + DBTheatreGroupWriteDao()
         + create(theatreGroup: TheatreGroup): TheatreGroup
         + update(id: long, theatreGroup: TheatreGroup): TheatreGroup
         + delete(id: long): boolean
     }
-    class DBScreenReadDao<Screen> implements ReadDao{
-        - connection: Connection
+    class DBScreenReadDao<Screen> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBScreenReadDao()
         + findAll(): List<Screen>
-        + findById(id: long): Screen
+        + findById(id: long): Optional<Screen>
     }
-    class DBScreenWriteDao<Screen> implements ReadDao{
-        - connection: Connection
+    class DBScreenWriteDao<Screen> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBScreenWriteDao()
         + create(screen: Screen): Screen
         + update(id: long, screen: Screen): Screen
         + delete(id: long): boolean
     }
-    class DBSeatReadDao<Seat> implements ReadDao{
-        - connection: Connection
+    class DBSeatReadDao<Seat> extends com.movie_booking.dao.common.DBDao  implements ReadDao{
         + DBSeatReadDao()
-        + findById(id: long): Seat
+        + findById(id: long): Optional<Seat>
         + findAll(): List<Seat>
     }
-    class DBSeatWriteDao<Seat> implements WriteDao{
-        - connection: Connection
+    class DBSeatWriteDao<Seat> extends com.movie_booking.dao.common.DBDao  implements WriteDao{
         + DBSeatWriteDao()
         + create(seat: Seat): Seat
         + update(id: long, seat: Seat): Seat
         + delete(id: long): boolean
     }
-    class DBShowReadDao<Show> implements ReadDao{
-        - connection: Connection
+    class DBShowReadDao<Show> extends com.movie_booking.dao.common.DBDao implements ReadDao{
         + DBShowReadDao()
         + findAll(): List<Show>
-        + findById(id: long): Show
+        + findById(id: long): Optional<Show>
     }
-    class DBShowWriteDao<Show> implements WriteDao{
-        - connection: Connection
+    class DBShowWriteDao<Show> extends com.movie_booking.dao.common.DBDao  implements WriteDao{
         + DBShowWriteDao()
         + create(show: Show): Seat
         + update(id: long, show: Show): Show
@@ -233,20 +240,24 @@ package com.movie_booking.dao.mapping {
         + findCitiesByMovie(movieId: long): List<City>
     }
     interface MovieCityWriteDao{
-        + addMoviesToCity(movieId: long, cityId: long)
+        + addMoviesToCity(movieId: long, cityId: long): boolean
     }
     'FR1: Get all movies by city query uses these DAO
-    class DBMovieCityReadDao implements MovieCityReadDao{
-        - connection: Connection
-        + DBMovieCityReadDao(connection)
+    class DBMovieCityReadDao extends com.movie_booking.dao.common.DBDao implements MovieCityReadDao{
+        - dbMovieReadDao: DBMovieReadDao
+        - dbCityReadDao: DBCityReadDao
+        + DBMovieCityReadDao(dbMovieReadDao: DBMovieReadDao, dbCityReadDao: DBCityReadDao)
         + findMoviesByCity(cityId: long): List<MovieDTO>
         + findCitiesByMovie(movieId: long): List<City>
+        + findAllMovies(): List<Movie>
+        + findAllCities(): List<City>
+        + findMovieById(): Optional<Movie>
+        + findCityById(): Optional<City>
     }
-
-    class DBMovieCityWriteDao implements MovieCityWriteDao{
-        - connection: Connection
-        + DBMovieCityWriteDao(connection)
-        + addMoviesToCity(movieId: long, cityId: long)
+    class DBMovieCityWriteDao extends com.movie_booking.dao.common.DBDao implements MovieCityWriteDao{
+        - dbMovieWriteDao: DBMovieWriteDao
+        + DBMovieCityWriteDao()
+        + addMoviesToCity(movieId: long, cityId: long): boolean
     }
     'FR2: Get all theatres for movie x in the city y'
     interface TheatreMovieReadDao{
@@ -258,16 +269,21 @@ package com.movie_booking.dao.mapping {
     interface TheatreMovieWriteDao{
         + addMovieTheatreCity(cityId: long, movieId: long, theatreId: long): boolean
     }
-    class DBTheatreMovieReadDao implements TheatreMovieReadDao {
-        - connection: Connection
-        + DBTheatreMovieReadDao()
+    class DBTheatreMovieReadDao extends com.movie_booking.dao.common.DBDao implements TheatreMovieReadDao {
+        - dbTheatreReadDao: DBTheatreReadDao
+        - dbCityReadDao: DBCityReadDao
+        + DBTheatreMovieReadDao(dbTheatreReadDao: DBTheatreReadDao, dbCityReadDao: DBCityReadDao)
         + findAllTheatres(movieId: long, cityId: long): List<TheatreShowDTO>
         + findAllTheatres(cityId: long): List<TheatreShowDTO>
         + findAllMovies(cityId: long): List<Movie>
         + findAllMovies(theatreId: long, cityId: long): List<Movie>
+        + findAllTheatres(): List<Theatre>
+        + findAllCities(): List<City>
+        + findTheatreById(): Optional<Theatre>
+        + findCityById(): Optional<City>
     }
-    class DBTheatreMovieWriteDao implements TheatreMovieWriteDao {
-        - connection: Connection
+    class DBTheatreMovieWriteDao extends com.movie_booking.dao.common.DBDao implements TheatreMovieWriteDao {
+        + dbTheatreWriteDao: DBTheatreWriteDao
         + DBTheatreMovieWriteDao()
         + addMovieTheatreCity(cityId: long, movieId: long, theatreId: long): boolean
     }
@@ -279,13 +295,11 @@ package com.movie_booking.dao.mapping {
         + addShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
         + updateShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
     }
-    class DBShowSeatReadDao implements ShowSeatReadDao{
-        - connection: Connection
+    class DBShowSeatReadDao extends com.movie_booking.dao.common.DBDao implements ShowSeatReadDao{
         + DBShowSeatReadDao()
         + findAllSeats(showId: long): List<SeatDTO>
     }
-    class DBShowSeatWriteDao implements ShowSeatWriteDao{
-        - connection: Connection
+    class DBShowSeatWriteDao extends com.movie_booking.dao.common.DBDao implements ShowSeatWriteDao{
         + DBShowSeatWriteDao()
         + addShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
         + updateShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
@@ -300,24 +314,94 @@ package com.movie_booking.dao.mapping {
         + createBooking(booking: Booking)
         + updateBooking(bookingId: long, booking: Booking)
     }
-    class DBBookSeatReadDao implements BookSeatReadDao{
-        - connection: Connection
+    class DBBookSeatReadDao extends com.movie_booking.dao.common.DBDao implements BookSeatReadDao{
         + DBBookSeatReadDao()
         + findBooking(booking: id): Booking
         + findAllBookings(): List<Booking>
         + findAllBookings(userId: long): List<Booking>
     }
-    class DBBookSeatWriteDao implements BookSeatWriteDao{
-        - connection: connection
+    class DBBookSeatWriteDao extends com.movie_booking.dao.common.DBDao implements BookSeatWriteDao{
         + DBBookSeatWriteDao()
+        + createBooking(booking: Booking)
+        + updateBooking(bookingId: long, booking: Booking)
+    }
+}
+package com.movie_booking.service.read {
+    class ReadUserService{
+        - userReadDao: DBReadUserDao
+        + ReadUserService()
+        + findUserById(userId: long): User
+    }
+    class ReadMovieService{
+        - movieReadDao: DBMovieCityReadDao
+        + findAllMoviesInCity(cityId: long): List<Movie>
+        + addMovies(movie:  Movie): boolean
+    }
+    class ReadTheatreService{
+        - theatreReadDao: DBTheatreMovieReadDao
+        + findAllTheatres(movieId: long, cityId: long): List<TheatreShowDTO>
+    }
+    class ReadShowSeatService{
+        - showSeatReadDao: DBShowSeatReadDao
+        + findAllSeats(showId: long): List<com.movie_booking.models.SeatDTO>
+    }
+    class ReadBookingService{
+        - bookingReadDao: DBBookSeatReadDao
+        + findBooking(booking: id): Booking
+        + findAllBookings(): List<Booking>
+        + findAllBookings(userId: long): List<Booking>
+    }
+}
+package com.movie_booking.service.write {
+    class WriteUserService{
+        - userWriteDao: DBUserWriteDao
+        + WriteUserService()
+        + addUser(user:User): boolean
+        + updateUser(long: userId, user: User): User
+    }
+    class WriteMovieService{
+        - movieWriteDao: DBMovieCityWriteDao
+        + addMovies(movie: Movie): boolean
+        + updateMovies(movieId: long, movie: Movie)
+    }
+    class WriteTheatreService{
+        - theatreWriteDao: DBTheatreMovieWriteDao
+        + addTheatre(theatre: Theatre): boolean
+        + updateTheatre(theatreId: long, theatre: Theatre): Theatre
+    }
+    class WriteShowSeatService{
+        - showSeatWriteDao: DBShowSeatWriteDao
+        + addShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
+        + updateShowSeat(showId: long, seatId: long, seatStatusId: int, seatCategoryId: int): SeatDTO
+    }
+    class WriteBookingService{
+        - bookingReadDao: DBBookSeatReadDao
+        + findBooking(booking: id): Booking
+        + findAllBookings(): List<Booking>
+        + findAllBookings(userId: long): List<Booking>
+    }
+    class WriteBookSeatService{
+        - bookingWriteDao: DBBookSeatWriteDao
         + createBooking(booking: Booking)
         + updateBooking(bookingId: long, booking: Booking)
     }
 }
 
 'Relationship
-'Movie --> MovieReleaseDetails : has
 Theatre --> Screen : has
 Theatre --> Address : has
 Screen --> Seat
+'WriteService
+WriteUserService *-- DBUserWriteDao
+WriteMovieService *-- DBMovieCityWriteDao
+WriteTheatreService *-- DBTheatreMovieWriteDao
+WriteShowSeatService *-- DBShowSeatWriteDao
+WriteBookingService *-- DBBookSeatReadDao
+WriteBookSeatService *-- DBBookSeatWriteDao
+'ReadService
+ReadUserService *-- DBReadUserDao
+ReadMovieService *-- DBMovieCityReadDao
+ReadTheatreService *-- DBTheatreMovieReadDao
+ReadShowSeatService *-- DBShowSeatReadDao
+ReadBookingService *-- DBBookSeatReadDao
 @enduml

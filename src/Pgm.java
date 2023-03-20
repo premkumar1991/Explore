@@ -10,6 +10,9 @@ public class Pgm {
        print(a1);
 
    }
+
+
+
     public static void print(List<Integer> list){
         for(Integer a: list){
             System.out.println(a);
