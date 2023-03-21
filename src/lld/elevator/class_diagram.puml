@@ -1,0 +1,105 @@
+@startuml
+class Building{
+    - id: int
+    - name: String
+    - elevator: List<Elevator>
+}
+class Elevator{
+    - id: int
+    - name: String
+    - speed: float
+    - maxCapacity: float
+    - currPositionY: float
+    - direction: Direction
+    - elevatorInternalUserInterface: ElevatorInternalUserInterface
+    - elevatorExternalUserInterface: ElevatorExternalUserInterface
+    - state: ElevatorState
+    - status: ElevatorStatus
+}
+enum ElevatorStatus{
+    Available
+    NotAvailable
+}
+enum ElevatorState{
+    Move
+    Idle
+}
+class Direction{
+    Up
+    Down
+    Rest
+}
+interface ElevatorInternalUserInterface{
+    + internalRequest(floor: int, direction: Direction)
+    + open()
+    + close()
+    + alarm()
+    + call()
+}
+interface ElevatorExternalUserInterface{
+    + externalRequest(direction: Direction)
+}
+interface ElevatorRequest{
+    + internalRequest(floor: int, direction: Direction)
+    + externalRequest(direction: Direction)
+}
+interface ElevatorAlgorithm extends ElevatorRequest{
+    + move()
+    + pause()
+    + resume()
+}
+
+'note left of ElevatorManagerControl
+'    Master control interface managed by elevator manager to start, pause, resume the elevator.
+'    Kind of master room controller for elevator
+'end note
+class ElevatorManager implements ElevatorRequest{
+    - elevator: Elevator
+    - elevatorAlgorithm: ElevatorAlgorithm
+    + ElevatorManager(elevator: Elevator, elevatorAlgorithm: ElevatorAlgorithm)
+    + internalRequest(floor: long, direction: Direction)
+    + externalRequest(direction: Direction)
+    + stop()
+    + start()
+}
+class LookAheadScanAlgorithm implements ElevatorAlgorithm{
+    - currFloor: int
+    - startFloor: int
+    - endFloor: int
+    - elevator: Elevator
+    - upRequest: List<Integer>
+    - downRequest: List<Integer>
+    + internalRequest(floor: int, direction: Direction)
+    + externalRequest(direction: Direction)
+    + move()
+    + pause()
+    + resume()
+    - calcFloorFromElevatorPositionY(): int
+}
+interface ElevatorCoordinatorAlgorithm{
+    + scheduleElevator(direction: Direction)
+}
+note left of ElevatorCoordinatorAlgorithm
+    This interface responsible for multiple elevator coordination
+end note
+
+class ElevatorCoordinator implements ElevatorCoordinatorAlgorithm{
+'group_no, and its associated set of Elevator managers`
+    - elevatorCoordinator: Map<Integer, Set<ElevatorManager>>
+    + scheduleElevator(direction: Direction)
+    + addElevatorToGroup(elevatorGroupId: int, elevatorManager: ElevatorManager)
+}
+
+note left of ElevatorAlgorithm
+    This interface responsible for single elevator algorithm
+end note
+
+'Relationship
+Building o-- Elevator : "1..*"
+Elevator o-- ElevatorInternalUserInterface : "1..1"
+Elevator o-- ElevatorExternalUserInterface : "1..1"
+ElevatorManager o-- Elevator : "1..1"
+ElevatorManager o-- ElevatorAlgorithm : "1..1"
+ElevatorCoordinator o-- ElevatorManager : "1..*"
+LookAheadScanAlgorithm o-- Elevator
+@enduml
