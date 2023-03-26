@@ -1,0 +1,372 @@
+@startuml
+
+interface SIdGenerator<T>{
+    + setSeedId(seedId: T)
+    + getId(): T
+}
+class SerialLongIdentifier<Long> implements SIdGenerator{
+    + id: long
+    + setSeedId(seedId: long)
+    + getId(): long
+}
+class UserIdentifier<String> extends SIdGenerator{
+    - userId: String
+    + setSeedId(seedId: String)
+    + getId(): String
+}
+class SerialIntIdentifier<Integer> extends SIdGenerator{
+    - userId: String
+    + setSeedId(seedId: String)
+    + getId(): String
+}
+
+note left of UserIdentifier
+    This class is a specialization of SIdGenerator,
+    If user want to prefix or suffix something to existing long id
+    generated from SIdGenerator, they can do it here
+end note
+
+'Actors entities
+class User {
+    - id: UserIdentifier
+    - name: String
+    - email: String
+    - phoneNo: String
+    - countryCode: CountryCode
+    - dob: LocalDateTime
+}
+class Artist{
+    - id: UserIdentifier
+    - name: String
+    - email: String
+    - phoneNo: String
+    - artistType: ArtistType
+}
+class Admin{
+    - id: UserIdentifier
+    - addAccount(accountId: UserIdentifier)
+    - deleteAccount(accountId: UserIdentifier)
+}
+class Account{
+    - id: UserIdentifier
+    - accountStatus: AccountStatus
+    - createdDate: LocalDateTime
+}
+note left of Account
+    contains only account related information and all its mapping can be put it separate mapping entity
+    So, idpId here will break SRP
+    For Domain driven design, linking account to idp or payment can be put in separate entity when we
+    start DAO,DTO, mapping DAO,DTO, Entity would come
+    account_id user_id idp_id payment_id mapping can be evolved when designing operation/ services
+end note
+'End of Actors entities...
+'All Enums definitions
+enum PriceUnits{
+    Dollars,
+    INR
+}
+enum AccountStatus{
+   Active,
+   Disabled,
+   Deleted
+}
+enum CountryCode{
+    IN
+}
+enum SubscriptionTypes{
+    Free
+    Mini
+    Individual
+    Duo
+    Family
+}
+enum ActorType{
+    User
+    Artist
+    Admin
+}
+enum AudioFormat{
+    wav
+    mp3
+}
+enum Genre{
+    Pop,
+    Rhythm
+}
+enum MediaType{
+    Audio
+    Video
+}
+enum ArtistType{
+    Director
+    Singer
+}
+'End of enums
+
+class SubscriptionIdentifier extends SIdGenerator{
+    - id: String
+    - getId(): String
+}
+class Subscription{
+    - id: SubscriptionIdentifier
+    - name: String
+    - price: float
+    - priceUnit: PriceUnits
+}
+
+'FR1: sign_up, sign_in and identity providers
+interface IDP{
+    + signIn(Map<String, String> authParams): IDPResponse
+    + signUp(Map<String, String> authParams): IDPResponse
+    + signOut(Map<String, String> authParams): IDPResponse
+    + validateTrustIdentity(): TrustIdentityResponse
+    + getUserDetails(): IDPUserProfile
+}
+note left of IDP
+    This interface has common operation for all IDP
+    Example signIn, sign out is common
+    Also, params is Map<String, String> so it can scale
+    Example client can use like authParams.get("clientId") or it can be different for other IDP,
+    map is good common abstraction for all IDP params
+end note
+class IDPResponse{
+    - status: String
+}
+class TrustIdentityResponse{
+    - valid: boolean
+}
+interface IDPUserProfile{
+    + getAccessToken(): String
+    + getExpirationTime(): long
+}
+note left of IDPUserProfile
+    This interface is common profile data operation for all IDP User Profile data
+    Considering id, accessToken and expirationTime common for all IDP
+end note
+class IDPIdentifier extends SIdGenerator{
+    - id: String
+}
+class GoogleIDPUserProfile implements IDPUserProfile{
+    - id: IDPIdentifier
+    - accessToken: String
+    - expirationTime: long
+    - email: String
+    + getId(): IDPIdentifier
+    + getAccessToken(): String
+    + getExpirationTime(): long
+    + getEmail(): String
+}
+note left of GoogleIDPUserProfile
+    This interface is specialized interface of google IDP User profile data
+    Consider email is a specialized one here, but it can be more.
+end note
+class FacebookIDPUserProfile implements IDPUserProfile{
+    - id: IDPIdentifier
+    - accessToken: String
+    - expirationTime: long
+    - phone: String
+    + getId(): IDPIdentifier
+    + getAccessToken(): String
+    + getExpirationTime(): long
+    + getPhoneNumber(): String
+}
+class GoogleIDP implements IDP{
+    + signIn(Map<String, String> authParams): IDPResponse
+    + signUp(Map<String, String> authParams): IDPResponse
+    + signOut(Map<String, String> authParams): IDPResponse
+    + validateTrustIdentity(): TrustIdentityResponse
+    + getUserDetails(): IDPUserProfile
+}
+class FacebookIDP implements IDP{
+    + signIn(Map<String, String> authParams): IDPResponse
+    + signUp(Map<String, String> authParams): IDPResponse
+    + signOut(Map<String, String> authParams): IDPResponse
+    + validateTrustIdentity(): TrustIdentityResponse
+    + getUserDetails(): IDPUserProfile
+}
+class EmailIDP implements IDP{
+    + signIn(Map<String, String> authParams): IDPResponse
+    + signUp(Map<String, String> authParams): IDPResponse
+    + signOut(Map<String, String> authParams): IDPResponse
+    + validateTrustIdentity(): TrustIdentityResponse
+    + getUserDetails(): IDPUserProfile
+}
+'end of FR1
+
+'FR2: Media related entities like playlist, songs, podcasts, shows, albums
+class MediaIdentifier extends SIdGenerator{
+    - id: long
+    - getId(): long
+}
+abstract class BaseMedia{
+    # id: MediaIdentifier
+    # title: String
+    # genre: Genre
+    # duration: long
+    # mediaType: MediaType
+    # artist: List<Artist>
+    # mediaUrl: String
+    + getId(): long
+    + getTitle(): String
+    + getGenre(): Genre
+    + getArtist(): List<Artist>
+    + getDurationInMilliSecs(): long
+    + getMediaType(): MediaType
+    + getMediaUrl(): String
+}
+
+note left of BaseMedia
+This is to abstract media layer even it is audio system by keeping
+other videos, and so on to support in future
+end note
+
+enum Genre{
+    Pop
+    Rock
+}
+class Audio implements BaseMedia{
+    lyrics: Map<LanguageCode, Lyrics >
+    album: Album
+}
+class Lyrics{
+    id: UserIdentifier
+    languageCode: LanguageCode
+    content: String
+    contentUrl: String
+}
+enum LanguageCode{
+    En_Us
+    Hindi
+    Tamil
+    Telugu
+}
+'Home page listing
+class MediaTopic{
+    id: UserIdentifier
+    preference: List<MediaSubTopic>
+}
+class MediaSubTopic{
+    id: UserIdentifier
+    Genre: Genre
+    playlist: Map<PlaylistType, UserIdentifier>
+}
+class PlaylistType{
+    Podcast
+    Show
+    Album
+    PlayList
+    Artist
+}
+class Album{
+    id: UserIdentifier
+    genre: Genre
+    mediaList: List<Media>
+}
+class Podcast{
+    id: UserIdentifier
+    genre: Genre
+    episodes: List<Episode>
+}
+class Episode{
+    id: SerialIntIdentifier
+    title: String
+    description: String
+    media: Media
+}
+enum ShowGenre{
+    Society
+    Culture
+    Comedy
+}
+class Show{
+    id: SerialLongIdentifier
+    genre: showGenre
+    description: String
+    media: Media
+}
+class PlayList{
+    id: UserIdentifier
+    name: String
+    media: List<Media>
+}
+note left of PlayList
+    This is general playlist at system level and user level
+end note
+'end of home page media listing
+
+'User functionality related entity
+class UserLibrary{
+    userId: UserIdentifier
+    playlist: Map<PlaylistType, UserIdentifier>
+}
+class UserPayment{
+    userId: UserIdentifier
+    paymentId:
+}
+class Payment{
+    id: UserIdentifier,
+    paymentType: PaymentType
+}
+enum PaymentType{
+    CreditCard,
+    UPI
+    AppWallet
+}
+
+
+
+'on hold: onboarding preference, will cover later
+'enum PreferenceType{
+'    Podcasts
+'    LiveEvents
+'    Language
+'    Genre
+'}
+'class Recommendation{
+'    id: UserIdentifier
+'}
+
+'Default search listing and preferences
+enum PreferenceType{
+  Podcast
+  Shows
+  LiveEvents
+  NewReleases
+  MadeForYou
+  Tamil
+  Telugu
+  Charts
+  Pop
+  Profile
+}
+class Preferences{
+    id: UserIdentifier
+    preferences: Map<PreferenceType, List<MediaTopic>>
+}
+
+note left of Preferences
+    has 3 level of hierarchy showing in default search
+    Podcast(Preference) > True Crime stories(Media topic) > Horrow Show by TMV Studios (Actual show) > list of episodes
+end note
+
+interface SearchInterface<T>{
+    + List<T> search(query: String)
+    + getResultType(): Class<T>
+}
+class PodcastSearch<Podcast> implements SearchInterface{
+    + List<Podcast> search(query: String)
+}
+class PlayListSearch<PlayList> implements SearchInterface{
+    + List<PlayList> search(query: String))
+}
+class MediaSearch<Media> implements SearchInterface{
+    + List<Media> search(query: String))
+}
+class SearchEngine{
+    - searchInterfaces: List<SearchInterface<T>>
+    + addSearchInterface(searchInterface: SearchInterface<T>)
+    + search(query: String, resultType: Class<T>)
+}
+'app to service provider trust certificate
+'user level trust
+@enduml
