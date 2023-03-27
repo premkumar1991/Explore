@@ -81,6 +81,15 @@ package com.spotify.models.user{
         Artist
         Admin
     }
+    class AccountUser{
+        - accountId: UserIdentifier
+        - userId: UserIdentifier
+        - idpId: IDPIdentifier
+    }
+    note top of AccountUser{
+        mapping entity discovered when we want to have a relation of account to user
+        and user to idp
+    }
 }
 package com.spotify.models.pricing{
     enum SubscriptionTypes{
@@ -107,25 +116,46 @@ package com.spotify.models.pricing{
 }
 
 package com.spotify.models.auth{
-    interface IDP{
-        + signIn(Map<String, String> authParams): IDPResponse
-        + signUp(Map<String, String> authParams): IDPResponse
-        + signOut(Map<String, String> authParams): IDPResponse
-        + validateTrustIdentity(): TrustIdentityResponse
-        + getUserDetails(): IDPUserProfile
+    interface IDP<A,B,C>{
+        + signIn(authParams: A): B
+        + signUp(authParams: A): B
+        + signOut(authParams: A): B
+        + getUserDetails(): C
     }
     note top of IDP
-        This interface has common operation for all IDP
-        Example signIn, sign out is common
-        Also, params is Map<String, String> so it can scale
-        Example client can use like authParams.get("clientId") or it can be different for other IDP,
-        map is good common abstraction for all IDP params
+        During oAuth from spotify, it sends application
+        client_id and client_secret and permissions scope
+        needed for the application
+        google sends authorizationCode to app,
+        app then request accessToken with the authorizationCode
+        app can now invoke api with accessToken
+        app(client_id,client_secret):google_auth_token
+        app(auth_token):google_access_token
+        api(access_token): google_response
     end note
     class IDPResponse{
         - status: String
     }
-    class TrustIdentityResponse{
-        - valid: boolean
+    abstract class AuthInput{
+        # clientId: String
+        # clientSecret: String
+        # email: String
+        # password: String
+        + getClientId(): String
+        + getClientSecret(): String
+        - scopeList: List<String>
+        + getScopeList(): List<String>
+
+    }
+    abstract class AuthOutput{
+        # authorizationCode: String
+        # accessToken: String
+    }
+    note top of AuthOutput{
+        Contains authorizationCode, accessToken value
+        we can use builder here for master list of response params
+        in first call response, you will be build with authorizationCode
+        in second call response, you will be build with accessToken
     }
     interface IDPUserProfile{
         + getAccessToken(): String
@@ -162,26 +192,23 @@ package com.spotify.models.auth{
         + getExpirationTime(): long
         + getPhoneNumber(): String
     }
-    class GoogleIDP implements IDP{
-        + signIn(Map<String, String> authParams): IDPResponse
-        + signUp(Map<String, String> authParams): IDPResponse
-        + signOut(Map<String, String> authParams): IDPResponse
-        + validateTrustIdentity(): TrustIdentityResponse
+    class GoogleIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+        + signIn(authInput: AuthInput): AuthOutput
+        + signUp(authInput: AuthInput)): AuthOutput
+        + signOut(Map<String, String> authParams): AuthOutput
         + getUserDetails(): IDPUserProfile
     }
-    class FacebookIDP implements IDP{
-        + signIn(Map<String, String> authParams): IDPResponse
-        + signUp(Map<String, String> authParams): IDPResponse
-        + signOut(Map<String, String> authParams): IDPResponse
-        + validateTrustIdentity(): TrustIdentityResponse
-        + getUserDetails(): IDPUserProfile
+    class FacebookIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+          + signIn(authInput: AuthInput): AuthOutput
+          + signUp(authInput: AuthInput)): AuthOutput
+          + signOut(Map<String, String> authParams): AuthOutput
+          + getUserDetails(): IDPUserProfile
     }
-    class EmailIDP implements IDP{
-        + signIn(Map<String, String> authParams): IDPResponse
-        + signUp(Map<String, String> authParams): IDPResponse
-        + signOut(Map<String, String> authParams): IDPResponse
-        + validateTrustIdentity(): TrustIdentityResponse
-        + getUserDetails(): IDPUserProfile
+    class EmailIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+         + signIn(authInput: AuthInput): AuthOutput
+         + signUp(authInput: AuthInput)): AuthOutput
+         + signOut(Map<String, String> authParams): AuthOutput
+         + getUserDetails(): IDPUserProfile
     }
 }
 
@@ -333,7 +360,7 @@ package com.spotify.models.search{
     note top of Preferences
         has 3 level of hierarchy showing in default search
         Podcast(Preference)
-        -- True Crime stories(Media topic)
+        -- True-Crime stories(Media topic)
                -- Horror Show by TMV Studios (Actual show) > list of episodes
     end note
     interface SearchInterface<T>{
@@ -356,6 +383,7 @@ package com.spotify.models.search{
     }
 }
 
+'FR1: Sign-in/ signup with different auth provider or app email/phone auth provider
 
 
 SearchEngine o-- "1..*" SearchInterface
