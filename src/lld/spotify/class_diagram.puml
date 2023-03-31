@@ -1,0 +1,393 @@
+@startuml
+
+package com.spotify.models.common{
+    interface SIdGenerator<T>{
+        + setSeedId(seedId: T): void
+        + getId(): T
+    }
+    class SerialLongIdentifier<Long> implements SIdGenerator{
+        + id: long
+        + setSeedId(seedId: long)
+        + getId(): long
+    }
+    class UserIdentifier<String> implements SIdGenerator{
+        - userId: String
+        + setSeedId(seedId: String)
+        + getId(): String
+    }
+    class SerialIntIdentifier<Integer> implements SIdGenerator{
+        - userId: String
+        + setSeedId(seedId: String)
+        + getId(): String
+    }
+    note top of UserIdentifier
+        This class is a specialization of SIdGenerator,
+        If user want to prefix or suffix something to existing long id
+        generated from SIdGenerator, they can do it here
+    end note
+    enum CountryCode{
+        IN
+    }
+}
+
+package com.spotify.models.user{
+    class User {
+        - id: UserIdentifier
+        - name: String
+        - email: String
+        - phoneNo: String
+        - countryCode: CountryCode
+        - dob: LocalDateTime
+    }
+    class Artist{
+        - id: UserIdentifier
+        - name: String
+        - email: String
+        - phoneNo: String
+        - artistType: ArtistType
+    }
+    class Admin{
+        - id: UserIdentifier
+        - addAccount(accountId: UserIdentifier)
+        - deleteAccount(accountId: UserIdentifier)
+    }
+    class Account{
+        - id: UserIdentifier
+        - accountStatus: AccountStatus
+        - createdDate: LocalDateTime
+    }
+    note top of Account
+        contains only account related information and all its mapping can be put it separate mapping entity
+        So, idpId here will break SRP
+        For Domain driven design, linking account to idp or payment can be put in separate entity when we
+        start DAO,DTO, mapping DAO,DTO, Entity would come
+        account_id user_id idp_id payment_id mapping can be evolved when designing operation/ services
+    end note
+    class UserLibrary{
+        userId: UserIdentifier
+        playlist: Map<PlaylistType, UserIdentifier>
+    }
+    class UserPayment{
+        userId: UserIdentifier
+        paymentId:
+    }
+    enum AccountStatus{
+       Active,
+       Disabled,
+       Deleted
+    }
+    enum ActorType{
+        User
+        Artist
+        Admin
+    }
+    class AccountUser{
+        - accountId: UserIdentifier
+        - userId: UserIdentifier
+        - idpId: IDPIdentifier
+    }
+    note top of AccountUser{
+        mapping entity discovered when we want to have a relation of account to user
+        and user to idp
+    }
+}
+package com.spotify.models.pricing{
+    enum SubscriptionTypes{
+        Free
+        Mini
+        Individual
+        Duo
+        Family
+    }
+    enum PriceUnits{
+        Dollars,
+        INR
+    }
+    class SubscriptionIdentifier implements SIdGenerator{
+        - id: String
+        - getId(): String
+    }
+    class Subscription{
+        - id: SubscriptionIdentifier
+        - name: String
+        - price: float
+        - priceUnit: PriceUnits
+    }
+}
+
+package com.spotify.models.auth{
+    interface IDP<A,B,C>{
+        + signIn(authParams: A): B
+        + signUp(authParams: A): B
+        + signOut(authParams: A): B
+        + getUserDetails(): C
+    }
+    note top of IDP
+        During oAuth from spotify, it sends application
+        client_id and client_secret and permissions scope
+        needed for the application
+        google sends authorizationCode to app,
+        app then request accessToken with the authorizationCode
+        app can now invoke api with accessToken
+        app(client_id,client_secret):google_auth_token
+        app(auth_token):google_access_token
+        api(access_token): google_response
+    end note
+    class IDPResponse{
+        - status: String
+    }
+    abstract class AuthInput{
+        # clientId: String
+        # clientSecret: String
+        # email: String
+        # password: String
+        + getClientId(): String
+        + getClientSecret(): String
+        - scopeList: List<String>
+        + getScopeList(): List<String>
+
+    }
+    abstract class AuthOutput{
+        # authorizationCode: String
+        # accessToken: String
+    }
+    note top of AuthOutput{
+        Contains authorizationCode, accessToken value
+        we can use builder here for master list of response params
+        in first call response, you will be build with authorizationCode
+        in second call response, you will be build with accessToken
+    }
+    interface IDPUserProfile{
+        + getAccessToken(): String
+        + getExpirationTime(): long
+    }
+    note top of IDPUserProfile
+        This interface is common profile data operation for all IDP User Profile data
+        Considering id, accessToken and expirationTime common for all IDP
+    end note
+    class IDPIdentifier implements SIdGenerator{
+        - id: String
+    }
+    class GoogleIDPUserProfile implements IDPUserProfile{
+        - id: IDPIdentifier
+        - accessToken: String
+        - expirationTime: long
+        - email: String
+        + getId(): IDPIdentifier
+        + getAccessToken(): String
+        + getExpirationTime(): long
+        + getEmail(): String
+    }
+    note bottom of GoogleIDPUserProfile
+        This interface is specialized interface of google IDP User profile data
+        Consider email is a specialized one here, but it can be more.
+    end note
+    class FacebookIDPUserProfile implements IDPUserProfile{
+        - id: IDPIdentifier
+        - accessToken: String
+        - expirationTime: long
+        - phone: String
+        + getId(): IDPIdentifier
+        + getAccessToken(): String
+        + getExpirationTime(): long
+        + getPhoneNumber(): String
+    }
+    class GoogleIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+        + signIn(authInput: AuthInput): AuthOutput
+        + signUp(authInput: AuthInput)): AuthOutput
+        + signOut(Map<String, String> authParams): AuthOutput
+        + getUserDetails(): IDPUserProfile
+    }
+    class FacebookIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+          + signIn(authInput: AuthInput): AuthOutput
+          + signUp(authInput: AuthInput)): AuthOutput
+          + signOut(Map<String, String> authParams): AuthOutput
+          + getUserDetails(): IDPUserProfile
+    }
+    class EmailIDP<AuthInput,AuthOutput, IDPUserProfile> implements IDP{
+         + signIn(authInput: AuthInput): AuthOutput
+         + signUp(authInput: AuthInput)): AuthOutput
+         + signOut(Map<String, String> authParams): AuthOutput
+         + getUserDetails(): IDPUserProfile
+    }
+}
+
+package com.spotify.models.media{
+    enum AudioFormat{
+        wav
+        mp3
+    }
+    enum Genre{
+        Pop,
+        Rhythm
+    }
+    enum MediaType{
+        Audio
+        Video
+    }
+    enum ArtistType{
+        Director
+        Singer
+    }
+    class MediaIdentifier implements SIdGenerator{
+        - id: long
+        - getId(): long
+    }
+    abstract class BaseMedia{
+        # id: MediaIdentifier
+        # title: String
+        # genre: Genre
+        # duration: long
+        # mediaType: MediaType
+        # artist: List<Artist>
+        # mediaUrl: String
+        + getId(): long
+        + getTitle(): String
+        + getGenre(): Genre
+        + getArtist(): List<Artist>
+        + getDurationInMilliSecs(): long
+        + getMediaType(): MediaType
+        + getMediaUrl(): String
+    }
+
+    note top of BaseMedia
+    This is to abstract media layer even it is audio system by keeping
+    other videos, and so on to support in future
+    end note
+
+    enum Genre{
+        Pop
+        Rock
+    }
+    class Audio implements BaseMedia{
+        lyrics: Map<LanguageCode, Lyrics >
+        album: Album
+    }
+    class Lyrics{
+        id: UserIdentifier
+        languageCode: LanguageCode
+        content: String
+        contentUrl: String
+    }
+    enum LanguageCode{
+        En_Us
+        Hindi
+        Tamil
+        Telugu
+    }
+    'Home page listing
+    class MediaTopic{
+        id: UserIdentifier
+        preference: List<MediaSubTopic>
+    }
+    class MediaSubTopic{
+        id: UserIdentifier
+        Genre: Genre
+        playlist: Map<PlaylistType, UserIdentifier>
+    }
+    class PlaylistType{
+        Podcast
+        Show
+        Album
+        PlayList
+        Artist
+    }
+    class Album{
+        id: UserIdentifier
+        genre: Genre
+        mediaList: List<Media>
+    }
+    class Podcast{
+        id: UserIdentifier
+        genre: Genre
+        episodes: List<Episode>
+    }
+    class Episode{
+        id: SerialIntIdentifier
+        title: String
+        description: String
+        media: Media
+    }
+    enum ShowGenre{
+        Society
+        Culture
+        Comedy
+    }
+    class Show{
+        id: SerialLongIdentifier
+        genre: showGenre
+        description: String
+        media: Media
+    }
+    class PlayList{
+        id: UserIdentifier
+        name: String
+        media: List<Media>
+    }
+    note top of PlayList
+        This is general playlist at system level and user level
+    end note
+}
+package com.spotify.models.payment{
+    class Payment{
+        - id: UserIdentifier,
+        - paymentType: PaymentType
+    }
+    enum PaymentType{
+        CreditCard,
+        UPI
+        AppWallet
+    }
+}
+
+package com.spotify.models.search{
+    enum PreferenceType{
+      Podcast
+      Shows
+      LiveEvents
+      NewReleases
+      MadeForYou
+      Tamil
+      Telugu
+      Charts
+      Pop
+      Profile
+    }
+    class Preferences{
+        - id: UserIdentifier
+        - preferences: Map<PreferenceType, List<MediaTopic>>
+    }
+    note top of Preferences
+        has 3 level of hierarchy showing in default search
+        Podcast(Preference)
+        -- True-Crime stories(Media topic)
+               -- Horror Show by TMV Studios (Actual show) > list of episodes
+    end note
+    interface SearchInterface<T>{
+        + search(query: String): List<T>
+        + getResultType(): Class<T>
+    }
+    class PodcastSearch<Podcast> implements SearchInterface{
+        + search(query: String): List<Podcast>
+    }
+    class PlayListSearch<PlayList> implements SearchInterface{
+        + search(query: String)): List<PlayList>
+    }
+    class MediaSearch<Media> implements SearchInterface{
+        + search(query: String)): List<Media>
+    }
+    class SearchEngine{
+        - searchInterfaces: List<SearchInterface<T>>
+        + addSearchInterface(searchInterface: SearchInterface<T>): void
+        + search(query: String, resultType: Class<T>): List<T>
+    }
+}
+
+'FR1: Sign-in/ signup with different auth provider or app email/phone auth provider
+
+
+SearchEngine o-- "1..*" SearchInterface
+Preferences o-- "1..*" MediaTopic
+
+
+@enduml
